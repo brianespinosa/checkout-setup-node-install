@@ -1,0 +1,25 @@
+name: 'GitHub Workflow Cleaner Action'
+author: 'Brian Espinosa'
+description: 'Composite action that will check out our code, set up node and yarn with caching, and install yarn dependencies'
+
+branding:
+  icon: 'download-cloud'
+  color: 'green'
+
+runs:
+  using: "composite"
+
+  steps:
+    # https://github.com/actions/checkout#usage
+    - uses: actions/checkout@v3
+
+    # https://github.com/actions/setup-node#usage
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: ".nvmrc"
+        cache: "yarn"
+
+    - run: yarn install --immutable
+      shell: bash
+      
