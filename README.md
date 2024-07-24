@@ -1,7 +1,7 @@
 # checkout-setup-node-install
 
 ![Last Updated](https://img.shields.io/github/last-commit/brianespinosa/checkout-setup-node-install?label=Last%20Updated&cacheSeconds=120)
-![Project License](https://img.shields.io/github/license/brianespinosa/checkout-setup-node-install?label=Project%20License&color=blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Composite action that will check out our code, set up node and yarn with caching, and install yarn dependencies
 
@@ -18,6 +18,10 @@ on:
   push:
     branches: [main]
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
