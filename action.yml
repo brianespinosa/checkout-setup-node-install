@@ -12,6 +12,8 @@ runs:
   steps:
     # https://github.com/actions/checkout#usage
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     # https://github.com/actions/setup-node#usage
     - name: Set up Node
