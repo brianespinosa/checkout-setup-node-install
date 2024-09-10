@@ -21,6 +21,9 @@ runs:
       with:
         node-version-file: ".nvmrc"
         cache: "yarn"
+        cache-dependency-path: |
+          **/*.lock
+          yarn.lock
 
     - run: yarn install --immutable
       shell: bash
