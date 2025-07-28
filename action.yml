@@ -16,10 +16,20 @@ runs:
         fetch-depth: 0
 
     # https://github.com/actions/setup-node#usage
-    - name: Set up Node
+    # NOTE: Due to a long-standing problem with this action not having support for corepack, we need to:
+    #       1. Install node first
+    #       2. Enable Corepack
+    #       3. Enable dependency cache
+    #       https://github.com/actions/setup-node/issues/531
+    - name: Install Node
       uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
+    - name: Enable Corepack
+      run: corepack enable
+    - name: Enable dependency cache
+      uses: actions/setup-node@v4
+      with:
         cache: "yarn"
         cache-dependency-path: |
           **/*.lock
