@@ -26,6 +26,7 @@ runs:
       with:
         node-version-file: ".nvmrc"
     - name: Enable Corepack
+      shell: bash
       run: corepack enable
     - name: Enable dependency cache
       uses: actions/setup-node@v4
