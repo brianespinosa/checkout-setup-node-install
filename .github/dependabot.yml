@@ -21,7 +21,7 @@ updates:
       interval: "weekly"
     rebase-strategy: "auto"
     commit-message:
-      prefix: "feat!"
+      prefix: "feat!:"
       include: "scope"
     ignore:
       - dependency-name: "*"
