@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current tag
+        id: current_tag
+        run: |
+          TAG="$(git describe --tags --abbrev=0 2>/dev/null || echo '')"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Determine next version
+        id: next_version
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --bumped-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if release is needed
+        id: check
+        run: |
+          CURRENT="${{ steps.current_tag.outputs.tag }}"
+          NEXT="$(echo "${{ steps.next_version.outputs.stdout }}" | xargs)"
+
+          if [ -z "$NEXT" ] || [ "$NEXT" = "$CURRENT" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No version bump needed (next: ${NEXT}, current: ${CURRENT})"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "version=${NEXT}" >> "$GITHUB_OUTPUT"
+            echo "Will release ${NEXT} (current: ${CURRENT})"
+          fi
+
+      - name: Generate changelog
+        if: steps.check.outputs.skip == 'false'
+        id: changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --unreleased --strip header --tag ${{ steps.check.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.check.outputs.version }}" \
+            --title "${{ steps.check.outputs.version }}" \
+            --notes "${{ steps.changelog.outputs.content }}" \
+            --target "${{ github.sha }}"
