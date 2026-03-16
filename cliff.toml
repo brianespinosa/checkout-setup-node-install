@@ -1,3 +1,8 @@
+[bump]
+initial_tag = "0.1.0"
+features_always_bump_minor = true
+breaking_always_bump_major = true
+
 [changelog]
 header = ""
 body = """
@@ -16,6 +21,7 @@ filter_unconventional = true
 split_commits = false
 commit_parsers = [
     { message = "^feat", group = "Features" },
+    { message = "^fix\\(deps\\)", group = "Dependencies" },
     { message = "^fix", group = "Bug Fixes" },
     { message = "^perf", group = "Performance" },
     { message = "^refactor", group = "Refactor" },
@@ -24,5 +30,6 @@ commit_parsers = [
     { message = "^test", skip = true },
     { message = "^chore", skip = true },
     { message = "^ci", skip = true },
+    { message = "^build", skip = true },
 ]
 tag_pattern = "v[0-9].*"
