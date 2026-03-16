@@ -21,6 +21,9 @@ This directory contains GitHub Actions workflows and Dependabot configuration fo
 ## Dependabot (`dependabot.yml`)
 
 - Targets `github-actions` ecosystem only
-- All dependency updates use `fix(deps):` commit prefix → triggers patch version bump
-- Auto-rebasing is enabled
-- For major dependency updates that are breaking, manually create a `feat!:` commit when needed
+- Uses **two separate update entries** to produce different conventional commit prefixes based on update type:
+  - Minor/patch updates use `fix(deps):` prefix → triggers patch version bump
+  - Major updates use `feat!:(deps):` prefix → triggers major version bump
+- This workaround exists because Dependabot does not natively support different prefixes per semver bump type
+- The major entry uses `"feat!:"` (with colon included) because Dependabot only auto-appends a colon when the prefix ends with a letter, number, `)`, or `]`
+- Auto-rebasing is enabled on both entries

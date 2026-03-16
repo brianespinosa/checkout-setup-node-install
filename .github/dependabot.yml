@@ -1,6 +1,7 @@
 version: 2
 
 updates:
+  # Minor and patch updates — treated as patch-level bumps
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -9,3 +10,21 @@ updates:
     commit-message:
       prefix: "fix"
       include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Major updates — treated as breaking changes
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: "auto"
+    commit-message:
+      prefix: "feat!:"
+      include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
