@@ -35,7 +35,7 @@ jobs:
         id: check
         run: |
           CURRENT="${{ steps.current_tag.outputs.tag }}"
-          NEXT="$(echo "${{ steps.next_version.outputs.stdout }}" | xargs)"
+          NEXT="$(git-cliff --bumped-version 2>/dev/null | tail -1 | xargs)"
 
           if [ -z "$NEXT" ] || [ "$NEXT" = "$CURRENT" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
