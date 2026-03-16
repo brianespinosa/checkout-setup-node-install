@@ -23,6 +23,7 @@ This directory contains GitHub Actions workflows and Dependabot configuration fo
 - Targets `github-actions` ecosystem only
 - Uses **two separate update entries** to produce different conventional commit prefixes based on update type:
   - Minor/patch updates use `fix(deps):` prefix → triggers patch version bump
-  - Major updates use `feat!(deps):` prefix → triggers major version bump
+  - Major updates use `feat!:(deps):` prefix → triggers major version bump
 - This workaround exists because Dependabot does not natively support different prefixes per semver bump type
+- The major entry uses `"feat!:"` (with colon included) because Dependabot only auto-appends a colon when the prefix ends with a letter, number, `)`, or `]`
 - Auto-rebasing is enabled on both entries
