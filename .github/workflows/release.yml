@@ -34,6 +34,7 @@ jobs:
       - name: Check if release is needed
         id: check
         run: |
+          export PATH="$RUNNER_TEMP/git-cliff/bin:$PATH"
           CURRENT="${{ steps.current_tag.outputs.tag }}"
           NEXT="$(git-cliff --bumped-version 2>/dev/null | tail -1 | xargs)"
 
