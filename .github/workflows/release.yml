@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine next version
+        id: version
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --bumped-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if release is needed
+        id: check
+        run: |
+          NEXT_VERSION="${{ steps.version.outputs.stdout }}"
+          LATEST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || echo '')"
+
+          echo "next_version=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$NEXT_VERSION" ] || [ "$NEXT_VERSION" = "$LATEST_TAG" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No version bump needed (next: ${NEXT_VERSION}, latest: ${LATEST_TAG})"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "Will release ${NEXT_VERSION} (latest: ${LATEST_TAG})"
+          fi
+
+      - name: Generate changelog
+        if: steps.check.outputs.skip == 'false'
+        id: changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --unreleased --strip header
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.check.outputs.next_version }}
+          name: ${{ steps.check.outputs.next_version }}
+          body: ${{ steps.changelog.outputs.content }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
