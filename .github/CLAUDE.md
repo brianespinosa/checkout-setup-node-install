@@ -21,9 +21,13 @@ This directory contains GitHub Actions workflows and Dependabot configuration fo
 ## Dependabot (`dependabot.yml`)
 
 - Targets `github-actions` ecosystem only
-- Uses **two separate update entries** to produce different conventional commit prefixes based on update type:
-  - Minor/patch updates use `fix(deps):` prefix → triggers patch version bump
-  - Major updates use `feat!:(deps):` prefix → triggers major version bump
-- This workaround exists because Dependabot does not natively support different prefixes per semver bump type
-- The major entry uses `"feat!:"` (with colon included) because Dependabot only auto-appends a colon when the prefix ends with a letter, number, `)`, or `]`
-- Auto-rebasing is enabled on both entries
+- Single update entry with `fix(deps):` conventional commit prefix for all updates
+- Auto-rebasing is enabled
+
+### Major version PR title rewriting (`workflows/dependabot-major-prefix.yml`)
+
+- Dependabot cannot natively assign different commit prefixes per semver update type
+- A `pull_request_target` workflow detects major-version Dependabot PRs using `dependabot/fetch-metadata`
+- Rewrites PR title from `fix(deps): ...` to `feat!(deps): ...` so squash-merge commits trigger major version bumps via git-cliff
+- Uses `pull_request_target` (not `pull_request`) because Dependabot PRs have read-only tokens under the `pull_request` event
+- Safe because the workflow never checks out PR code — only reads event metadata and edits the PR title
