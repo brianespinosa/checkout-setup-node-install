@@ -22,14 +22,14 @@ runs:
     #       3. Enable dependency cache
     #       https://github.com/actions/setup-node/issues/531
     - name: Install Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version-file: ".nvmrc"
     - name: Enable Corepack
       shell: bash
       run: corepack enable
     - name: Enable dependency cache
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: "yarn"
         cache-dependency-path: |
