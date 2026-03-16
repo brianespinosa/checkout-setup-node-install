@@ -20,7 +20,7 @@ jobs:
       - name: Get current tag
         id: current_tag
         run: |
-          TAG="$(git describe --tags --abbrev=0 2>/dev/null || echo '')"
+          TAG="$(git tag --list 'v*.*.*' --sort=-version:refname | head -1)"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Determine next version
@@ -64,3 +64,13 @@ jobs:
             --title "${{ steps.check.outputs.version }}" \
             --notes "${{ steps.changelog.outputs.content }}" \
             --target "${{ github.sha }}"
+
+      - name: Update alias tags
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VERSION="${{ steps.check.outputs.version }}"
+          MAJOR="v$(echo "${VERSION#v}" | cut -d. -f1)"
+          MINOR="v$(echo "${VERSION#v}" | cut -d. -f1-2)"
+          git tag -f "$MAJOR" "${{ github.sha }}"
+          git tag -f "$MINOR" "${{ github.sha }}"
+          git push origin "$MAJOR" "$MINOR" --force
