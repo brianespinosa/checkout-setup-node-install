@@ -31,3 +31,5 @@ This directory contains GitHub Actions workflows and Dependabot configuration fo
 - Rewrites PR title from `fix(deps): ...` to `feat!(deps): ...` so squash-merge commits trigger major version bumps via git-cliff
 - Uses `pull_request_target` (not `pull_request`) because Dependabot PRs have read-only tokens under the `pull_request` event
 - Safe because the workflow never checks out PR code — only reads event metadata and edits the PR title
+
+**REQUIRED: All PRs must be merged via squash merge.** The title-rewriting only affects the PR title — the rewritten title becomes the commit message only when squash merging. A regular merge commit preserves the original commit message, causing git-cliff to see `fix(deps):` instead of `feat!(deps):` and produce the wrong version bump.
