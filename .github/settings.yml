@@ -1,0 +1,7 @@
+_extends: brianespinosa/settings:actions.yml
+
+repository:
+  name: checkout-setup-node-install
+  description: Composite action that will check out our code, set up node and yarn with caching, and install yarn dependencies
+  topics: github-actions,composite-action,nodejs,yarn,checkout
+  private: false
